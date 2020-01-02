@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width">
+<title>Leap Motion Color Changing</title>
+<link href="css/colorChange.css" rel="stylesheet">
+<script src="js/leap.js"></script>
+<script src="js/colorChange.js"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"
+                integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+                crossorigin="anonymous">
+</script>
+</head>
+<body onload="checkLibrary()">
+<h1>Leap Motion Volume Bar</h1>
+<div id="main">
+  <button id="pause" onclick="togglePause()">Pause</button>
+  <input type="checkbox" id="pauseOnGesture" onclick="pauseForGestures()">Pause on gesture</input>
+  <div style="clear:both;"></div>
+    <div id="volumeBar"></div>
+</div>
+</body>
+</html>
