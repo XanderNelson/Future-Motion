@@ -8,6 +8,24 @@ main{
   background-image: url("../images/fMotionHome");
 
 }
+.outline{
+  height:305px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-style: solid;
+  border-width:thick;
+  border-color: white;
+}
+.outlineHoriz{
+  width:305px;
+  height:220px;
+  /* margin-right: 20px;
+  margin-left: 20px; */
+  margin: 0 auto;
+  border-style: solid;
+  border-width:thick;
+  border-color: white;
+}
 .center{
   display: block;
   margin-left: auto;
@@ -69,6 +87,7 @@ main{
   filter: drop-shadow(10px 10px 5px #222);
 
 }
+
 #songControl h2{
   font-size: 350%;
 }
@@ -78,13 +97,13 @@ main{
 #volumeBar, #tempBar{
   margin: auto;
   width: 50%;
-  margin-top: 20px;
   margin-bottom: 20px;
-  /* background: #8cd633; */
   background:white;
-  height: 20em;
-  width: 30px;
+  height:0px;
+  width:210px;
+  margin-top:0;
 }
+
 #fan{
   padding-top: 5%;
   width:1000px;
@@ -93,12 +112,12 @@ main{
 #fanBar{
   margin: auto;
   width: 50%;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  /* background: #8cd633; */
+  /* margin-top: 20px;
+  margin-bottom: 20px; */
   background:white;
-  width: 20em;
-  height: 30px;
+  height:210px;
+  width:0px;
+  float: left;
 }
 #tempControl{
   padding-top:5%;

@@ -37,7 +37,21 @@ $(document).ready(function(){
   });
 
 
+  var navigationOn = false;
+  var climateOn = false;
+  var audioOn = false;
+  var settingsOn = false;
+  var controllerOptions = {enableGestures: true};//setting controller
+  var count = 0;
+  var count2 = 0;
+  var count3 = 0;
+
   function navigation(){
+
+    navigationOn = true;
+    climateOn = false;
+    audioOn = false;
+    settingsOn = false;
     $("#climateLogo").attr('src',"images/climate3D");
     $("#audioLogo").attr("src","images/audio3D");
     $("#navigationLogo").attr("src","images/navigationActive");
@@ -45,16 +59,118 @@ $(document).ready(function(){
     $("#navigationPage").show();
     $("#climatePage, #audioPage, #settingsPage").hide();
   }
+
+
+
+
+
+
+
+
+
   function climate(){
+
+    navigationOn = false;
+    climateOn = true;
+    audioOn = false;
+    settingsOn = false;
     $("#climateLogo").attr("src", "images/climateActive");
     $("#audioLogo").attr("src", "images/audio3D");
     $("#navigationLogo").attr("src","images/navigation3D");
     $("#settingsLogo").attr("src", "images/settings3D");
     $("#climatePage").show();
     $("#navigationPage, #audioPage, #settingsPage").hide();
-  }
-  function audio(){
+    if(climateOn == true){
+      // var count2 = 0;
+      // var count3 = 0;
+      Leap.loop(controllerOptions, function(frame) {
+        var fan = document.getElementById("fanBar");
+        var temp = document.getElementById("tempBar");
 
+        if (frame.hands.length > 0) {
+
+          for (var i = 0; i < frame.hands.length; i++) {
+
+              var hand = frame.hands[i];
+              var newClimateV = hand.palmVelocity;//changing volume
+
+              var velocityV = newClimateV[2];
+              var velocityH = newClimateV[0];
+              velocityV = parseFloat(velocityV);
+              velocityH = parseFloat(velocityH);
+
+              // console.log(velocityH);
+
+
+              if (frame.gestures.length > 0) {
+                for (var i = 0; i < frame.gestures.length; i++) {
+
+                  var gesture = frame.gestures[i];
+
+                  if(gesture.type == "swipe") {
+
+                      var isHorizontal = Math.abs(gesture.direction[0]) > Math.abs(gesture.direction[1]);
+
+                      if(isHorizontal){
+
+                        if(velocityH > 200 && count2 < 100){//function to change fan speed
+                          // console.log(velocityH);
+                                fan.style.width= count2*3+"px";
+                                count2=count2+2;
+                                // var newTemp = count/100;
+                            }
+                        if(velocityH < (-200) && count2 > 0){
+                            fan.style.width= count2*3+"px";
+                            count2=count2-2;
+                            // var newFan = count/100;
+                          }
+                      }
+                      else{
+                        var currTemp = Math.ceil((((count3)/100)*(83-58)+58));
+
+                        $("#tempurature").text(currTemp + "° F");
+
+                        if(velocityV > 200 && count3 < 100){//function to change temp
+                          console.log(count3);
+                                temp.style.height= count3*3+"px";
+                                count3=count3+2;
+                                // var newTemp = count/100;
+                            }
+                        if(velocityV < (-200) && count3 > 0){
+                            temp.style.height= count3*3+"px";
+                            count3=count3-2;
+                            // var newFan = count/100;
+                          }
+                      }
+
+
+                   }
+                 }
+              }
+            }
+        }
+
+      })
+    }
+    if(climateOn == false){
+      return;
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+  function audio(){
+    navigationOn = false;
+    climateOn = false;
+    audioOn = true;
+    settingsOn = false;
     $("#climateLogo").attr("src","images/climate3D");
     $("#audioLogo").attr("src","images/audioActive");
     $("#navigationLogo").attr("src","images/navigation3D");
@@ -84,16 +200,18 @@ $(document).ready(function(){
       var playing5 = document.getElementById("playing5");
 
       var counter = 0;
-      $("#nextSongButton").click(function(){
+    if(audioOn == true){
+      function increaseSong(){
         if(counter == 5){
-          counter = 0;
+            counter = 0;
+          }
+          else{
+            counter++;
+          }
+          nextSong();
+          return;
         }
-        else{
-          counter++;
-        }
-        nextSong();
-      });
-      $("#backSongButton").click(function(){
+      function decreaseSong(){
         if(counter == 0){
           counter = 5;
         }
@@ -101,12 +219,8 @@ $(document).ready(function(){
           counter--;
         }
         nextSong();
-      });
-      // playing.play();
-      // $("#title").html(songs[counter].song);
-      // $("#artist").html(songs[counter].artist);
-// this is a pretty robust playlist that I hope we can use the leap with after some modification
-// spent so long trying to do it a different way but the js/html audio is strange
+        return;
+      }
 
       function nextSong(){
         $("#title").html(songs[counter].song);
@@ -148,79 +262,136 @@ $(document).ready(function(){
           playing.pause();
         }
       }
-        // ignore this crap for now
-
-        // var song = $("#playing0 source").attr("src");
-        // var song1 = $("#playing1 source").attr("src");
-        // var song2 = $("#playing2 source").attr("src");
-        // var song3 = $("#playing3 source").attr("src");
-        // var song4 = $("#playing4 source").attr("src");
-        // var song5 = $("#playing5 source").attr("src");
-
-        // console.log(curSong);
-        // // var next = $("#")
-        // var i = 0;
-        // var indexPlay;
-        // for(i; i<5; i++){
-        //
-        //   // var check = "song" + i;
-        //   // if(song == sources[i] || song1 == sources[i] || song2 == sources[i] || song3 == sources[i] || song4 == sources[i] || song5 == sources[i]){
-        //   if(song == sources[i]){
-        //     if(i == 5){
-        //       i = 0; //looping through the songs
-        //     }
-        //     indexPlay = i+1;
-        //     var newPlay = document.getElementById("playing" + indexPlay);
-        //     newPlay.currentTime = 0;
-        //     newPlay.play();
-        //     break;
-        //   }
-        // }
-        // console.log(indexPlay);
-
-
-        // $("#playing0 source").attr("src", sources[i + 1]);
 
 
       var paused = false;
-      //var pauseOnGesture = false;
-      var count = 1;
+      var pauseOnGesture = false;
+      // var count = 0;
+
+
+
       // Setup Leap loop with frame callback function
-      var controllerOptions = {enableGestures: true};
 
       Leap.loop(controllerOptions, function(frame) {
         if (paused) {
             return; // Skip this update
         }
-
         var volume = document.getElementById("volumeBar");
 
+        $("#volume").text(count);
         if (frame.hands.length > 0) {
             for (var i = 0; i < frame.hands.length; i++) {
                 var hand = frame.hands[i];
-                var newV = hand.palmVelocity;
-                var velocity = newV[0];
+                var newV = hand.palmVelocity;//changing volume
+
+                var velocity = newV[2];
                 velocity = parseFloat(velocity);
 
-                if(velocity > 1500 && count < 1000){
-                        volume.style.width= count+20+"px";
-                        count=count+20;
-                        var newVolume = count/1000;
-                        playing.volume = newVolume;
+
+
+                // if (frame.gestures.length > 0) {
+                //   for (var i = 0; i < frame.gestures.length; i++) {
+                //     var gesture = frame.gestures[i];
+                //     if(gesture.type == "swipe") {
+                //         var isHorizontal = Math.abs(gesture.direction[0]) > Math.abs(gesture.direction[1]);
+                //         if(isHorizontal){
+                //             if(gesture.direction[0] > 0){
+                //               pauseOnGesture = true;
+                //               increaseSong();
+                //
+                //                 swipeDirection = "right";
+                //             } else {
+                //               pauseOnGesture = true;
+                //               decreaseSong();
+                //
+                //                 swipeDirection = "left";
+                //             }
+                //         }
+                //      }
+                //    }
+                // }
+
+
+
+
+                if(velocity > 700 && count < 100){//function to change volume
+                        volume.style.height= count*3+"px";
+                        count=count+2;
+                        var newVolume = count/100;
+
+                        if(counter == 0){
+                            playing.volume = newVolume;
+                        }
+                        if(counter == 1){
+                            playing1.volume = newVolume;
+                        }
+                        if(counter == 2){
+                            playing2.volume = newVolume;
+                        }
+                        if(counter == 3){
+                            playing3.volume = newVolume;
+                        }
+                        if(counter == 4){
+                            playing4.volume = newVolume;
+                        }
+                        if(counter == 5){
+                            playing5.volume = newVolume;
+                        }
                     }
 
-                if(velocity < (-1500) && count > 1){
-                        volume.style.width= count-20+"px";
-                        count=count-20;
-                        var newVolume = count/1000;
-                        playing.volume = newVolume;
+                if(velocity < (-700) && count > 1){
+                        volume.style.height= count*3+"px";
+                        count=count-2;
+                        var newVolume = count/100;
+                        if(counter == 0){
+                            playing.volume = newVolume;
+                        }
+                        if(counter == 1){
+                            playing1.volume = newVolume;
+                        }
+                        if(counter == 2){
+                            playing2.volume = newVolume;
+                        }
+                        if(counter == 3){
+                            playing3.volume = newVolume;
+                        }
+                        if(counter == 4){
+                            playing4.volume = newVolume;
+                        }
+                        if(counter == 5){
+                            playing5.volume = newVolume;
+                        }
                     }
-
             }
+
         }
+
+          if (frame.gestures.length > 0) {
+    if (pauseOnGesture) {
+      togglePause();
+    }
+
+    }
       })   //END OF LEAP LOOP
+
+    }
+    if(audioOn == false){
+      return;
+    }
   }
+
+
+
+
+
+
+
+
   function settings(){
+    navigationOn = false;
+    climateOn = false;
+    audioOn = false;
+    settingsOn = true;
     $("#climateLogo").attr("src","images/climate3D");
     $("#audioLogo").attr("src", "images/audio3D");
     $("#navigationLogo").attr("src", "images/navigation3D");
