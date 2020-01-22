@@ -41,7 +41,9 @@ $(document).ready(function(){
   var climateOn = false;
   var audioOn = false;
   var settingsOn = false;
-  var controllerOptions = {enableGestures: true};//setting controller
+  var controllerOptions = new Leap.Controller({enableGestures: true});//setting controller
+  var controllerOptions2 = new Leap.Controller({enableGestures: true});//setting controller
+
   var count = 0;
   var count2 = 0;
   var count3 = 0;
@@ -83,7 +85,12 @@ $(document).ready(function(){
     if(climateOn == true){
       // var count2 = 0;
       // var count3 = 0;
-      Leap.loop(controllerOptions, function(frame) {
+      Leap.loop(controllerOptions2, function(frame) {
+      // controllerOptions2.on('frame', function(frame_instance){
+      if(climateOn == false){
+        controllerOptions2.disconnect();
+        return;
+      }
         var fan = document.getElementById("fanBar");
         var temp = document.getElementById("tempBar");
 
@@ -142,19 +149,17 @@ $(document).ready(function(){
                             // var newFan = count/100;
                           }
                       }
-
-
                    }
                  }
               }
             }
         }
 
-      })
+      });
+      controllerOptions2.connect();
+
     }
-    if(climateOn == false){
-      return;
-    }
+
   }
 
 
@@ -273,6 +278,11 @@ $(document).ready(function(){
       // Setup Leap loop with frame callback function
 
       Leap.loop(controllerOptions, function(frame) {
+      // controllerOptions.on('frame', function(frame_instance){
+      if(audioOn == false){
+        controllerOptions.disconnect();
+        return;
+      }
         if (paused) {
             return; // Skip this update
         }
@@ -289,27 +299,27 @@ $(document).ready(function(){
 
 
 
-                // if (frame.gestures.length > 0) {
-                //   for (var i = 0; i < frame.gestures.length; i++) {
-                //     var gesture = frame.gestures[i];
-                //     if(gesture.type == "swipe") {
-                //         var isHorizontal = Math.abs(gesture.direction[0]) > Math.abs(gesture.direction[1]);
-                //         if(isHorizontal){
-                //             if(gesture.direction[0] > 0){
-                //               pauseOnGesture = true;
-                //               increaseSong();
-                //
-                //                 swipeDirection = "right";
-                //             } else {
-                //               pauseOnGesture = true;
-                //               decreaseSong();
-                //
-                //                 swipeDirection = "left";
-                //             }
-                //         }
-                //      }
-                //    }
-                // }
+                if (frame.gestures.length > 0) {
+                  for (var i = 0; i < frame.gestures.length; i++) {
+                    var gesture = frame.gestures[i];
+                    if(gesture.type == "swipe") {
+                        var isHorizontal = Math.abs(gesture.direction[0]) > Math.abs(gesture.direction[1]);
+                        if(isHorizontal){
+                            if(gesture.direction[0] > 0){
+                              pauseOnGesture = true;
+                              increaseSong();
+
+                                swipeDirection = "right";
+                            } else {
+                              pauseOnGesture = true;
+                              decreaseSong();
+
+                                swipeDirection = "left";
+                            }
+                        }
+                     }
+                   }
+                }
 
 
 
@@ -372,12 +382,11 @@ $(document).ready(function(){
     }
 
     }
-      })   //END OF LEAP LOOP
+  });   //END OF LEAP LOOP
+  controllerOptions.connect();
 
     }
-    if(audioOn == false){
-      return;
-    }
+
   }
 
 
