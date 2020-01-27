@@ -32,7 +32,7 @@ $(document).ready(function(){
         settings();
       }
     }
-    console.log(keyPressed);
+    // console.log(keyPressed);
 
   });
 
@@ -41,13 +41,14 @@ $(document).ready(function(){
   var climateOn = false;
   var audioOn = false;
   var settingsOn = false;
-  var controllerOptions = new Leap.Controller({enableGestures: true});//setting controller
-  var controllerOptions2 = new Leap.Controller({enableGestures: true});//setting controller
+  var controllerOptionsAudio = new Leap.Controller({enableGestures: true});//setting controller
+  var controllerOptionsClimate = new Leap.Controller({enableGestures: true});//setting controller
+  var controllerOptionsSettings = new Leap.Controller({enableGestures: true});//setting controller
 
   var count = 0;
   var count2 = 0;
   var count3 = 0;
-
+  var settingsCount = 0;
   function navigation(){
 
     navigationOn = true;
@@ -83,12 +84,9 @@ $(document).ready(function(){
     $("#climatePage").show();
     $("#navigationPage, #audioPage, #settingsPage").hide();
     if(climateOn == true){
-      // var count2 = 0;
-      // var count3 = 0;
-      Leap.loop(controllerOptions2, function(frame) {
-      // controllerOptions2.on('frame', function(frame_instance){
+      Leap.loop(controllerOptionsClimate, function(frame) {
       if(climateOn == false){
-        controllerOptions2.disconnect();
+        controllerOptionsClimate.disconnect();
         return;
       }
         var fan = document.getElementById("fanBar");
@@ -105,48 +103,37 @@ $(document).ready(function(){
               var velocityH = newClimateV[0];
               velocityV = parseFloat(velocityV);
               velocityH = parseFloat(velocityH);
-
               // console.log(velocityH);
 
 
               if (frame.gestures.length > 0) {
                 for (var i = 0; i < frame.gestures.length; i++) {
-
                   var gesture = frame.gestures[i];
-
                   if(gesture.type == "swipe") {
-
                       var isHorizontal = Math.abs(gesture.direction[0]) > Math.abs(gesture.direction[1]);
-
                       if(isHorizontal){
-
                         if(velocityH > 200 && count2 < 100){//function to change fan speed
-                          // console.log(velocityH);
-                                fan.style.width= count2*3+"px";
-                                count2=count2+2;
-                                // var newTemp = count/100;
+                            fan.style.width= count2*3+"px";
+                            count2=count2+2;
+                            $("#fanImg").css({'transform': 'rotate(180deg)'});
                             }
                         if(velocityH < (-200) && count2 > 0){
                             fan.style.width= count2*3+"px";
                             count2=count2-2;
-                            // var newFan = count/100;
+                            $("#fanImg").css({'transform': 'rotate(180deg)'});
                           }
                       }
                       else{
                         var currTemp = Math.ceil((((count3)/100)*(83-58)+58));
-
                         $("#tempurature").text(currTemp + "° F");
-
                         if(velocityV > 200 && count3 < 100){//function to change temp
                           console.log(count3);
                                 temp.style.height= count3*3+"px";
                                 count3=count3+2;
-                                // var newTemp = count/100;
                             }
                         if(velocityV < (-200) && count3 > 0){
                             temp.style.height= count3*3+"px";
                             count3=count3-2;
-                            // var newFan = count/100;
                           }
                       }
                    }
@@ -156,7 +143,7 @@ $(document).ready(function(){
         }
 
       });
-      controllerOptions2.connect();
+      controllerOptionsClimate.connect();
 
     }
 
@@ -277,10 +264,9 @@ $(document).ready(function(){
 
       // Setup Leap loop with frame callback function
 
-      Leap.loop(controllerOptions, function(frame) {
-      // controllerOptions.on('frame', function(frame_instance){
+      Leap.loop(controllerOptionsAudio, function(frame) {
       if(audioOn == false){
-        controllerOptions.disconnect();
+        controllerOptionsAudio.disconnect();
         return;
       }
         if (paused) {
@@ -297,28 +283,109 @@ $(document).ready(function(){
                 var velocity = newV[2];
                 velocity = parseFloat(velocity);
 
+                function timeOut(){
+                  controllerOptionsAudio.disconnect();
+                }
 
 
+                // if (frame.gestures.length > 0) {
+                //   for (var i = 0; i < frame.gestures.length; i++) {
+                //     var gesture = frame.gestures[i];
+                //     if(gesture.type == "swipe") {
+                //         var isHorizontal = Math.abs(gesture.direction[0]) > Math.abs(gesture.direction[1]);
+                //         if(isHorizontal){
+                //             if(gesture.direction[0] > 0){
+                //               increaseSong();
+                //               return;
+                //               // window.setTimeout(timeOut, 2000);
+                //               // controllerOptionsAudio.connect();
+                //               // window.clearTimeout(timeOut);
+                //
+                //             }
+                //             else {
+                //               decreaseSong();
+                //               return;
+                //               // window.setTimeout(timeOut, 2000);
+                //               // controllerOptionsAudio.connect();
+                //               // window.clearTimeout(timeOut);
+                //             }
+                //         }
+                //      }
+                //    }
+                // }
+                function isPlaying(song) {
+                   return !song.paused;
+                 }
                 if (frame.gestures.length > 0) {
                   for (var i = 0; i < frame.gestures.length; i++) {
                     var gesture = frame.gestures[i];
-                    if(gesture.type == "swipe") {
-                        var isHorizontal = Math.abs(gesture.direction[0]) > Math.abs(gesture.direction[1]);
-                        if(isHorizontal){
-                            if(gesture.direction[0] > 0){
-                              pauseOnGesture = true;
-                              increaseSong();
+                    if(gesture.type == "circle") {
+                        var newD = gesture.normal;
+                        var clockwiseness = newD[2];
+                        clockwiseness = parseFloat(clockwiseness);
+                        var circlestate = gesture.state;
+                        var circleprogress = gesture.progress;
+                        var circleradius = gesture.radius;
+                        if(clockwiseness < 0 && circlestate == "stop" && circleprogress > 1 && circleradius > 15){
+                            increaseSong();
 
-                                swipeDirection = "right";
-                            } else {
-                              pauseOnGesture = true;
-                              decreaseSong();
-
-                                swipeDirection = "left";
-                            }
                         }
-                     }
-                   }
+                        else if(clockwiseness > 0 && circlestate == "stop" && circleprogress > 1 && circleradius > 15){
+                            decreaseSong();
+                        }
+                    }
+                    if(gesture.type == "keyTap"){
+                      var direction = gesture.direction;
+                      if(counter == 0){
+                        if(isPlaying(playing)){
+                          playing.pause();
+                        }
+                        else{
+                          playing.play();
+                        }
+                      }
+                      if(counter == 1){
+                        if(isPlaying(playing1)){
+                          playing1.pause();
+                        }
+                        else{
+                          playing1.play();
+                        }
+                      }
+                      if(counter == 2){
+                        if(isPlaying(playing2)){
+                          playing2.pause();
+                        }
+                        else{
+                          playing2.play();
+                        }
+                      }
+                      if(counter == 3){
+                        if(isPlaying(playing3)){
+                          playing3.pause();
+                        }
+                        else{
+                          playing3.play();
+                        }
+                      }
+                      if(counter == 4){
+                        if(isPlaying(playing4)){
+                          playing4.pause();
+                        }
+                        else{
+                          playing4.play();
+                        }
+                      }
+                      if(counter == 5){
+                        if(isPlaying(playing5)){
+                          playing5.pause();
+                        }
+                        else{
+                          playing5.play();
+                        }
+                      }
+                    }
+                }
                 }
 
 
@@ -373,20 +440,15 @@ $(document).ready(function(){
                         }
                     }
             }
-
         }
-
           if (frame.gestures.length > 0) {
     if (pauseOnGesture) {
       togglePause();
     }
-
     }
   });   //END OF LEAP LOOP
-  controllerOptions.connect();
-
+  controllerOptionsAudio.connect();
     }
-
   }
 
 
@@ -407,44 +469,122 @@ $(document).ready(function(){
     $("#settingsLogo").attr("src", "images/settingsActive");
     $("#settingsPage").show();
     $("#climatePage, #audioPage, #navigationPage").hide();
+
+    if(settingsOn == true){
+
+      function nextSetting(){
+        if (settingsCount == 0){
+          $("#brightnessSet").removeClass("settingHighlight");
+          $("#audioSet").addClass("settingHighlight");
+          settingsCount++;
+        }
+        else if (settingsCount == 1){
+          $("#audioSet").removeClass("settingHighlight");
+          $("#clockSet").addClass("settingHighlight");
+          settingsCount++;
+        }
+        else if (settingsCount == 2){
+          $("#clockSet").removeClass("settingHighlight");
+          $("#oneMoreSet").addClass("settingHighlight");
+          settingsCount++;
+        }
+        else{
+          $("#oneMoreSet").removeClass("settingHighlight");
+          $("#brightnessSet").addClass("settingHighlight");
+          settingsCount = 0;
+        }
+      }
+      function backSetting(){
+        if (settingsCount == 0){
+          $("#brightnessSet").removeClass("settingHighlight");
+          $("#oneMoreSet").addClass("settingHighlight");
+          settingsCount = 3;
+        }
+        else if (settingsCount == 1){
+          $("#audioSet").addClass("settingHighlight");
+          $("#clockSet").removeClass("settingHighlight");
+          settingsCount--;
+        }
+        else if (settingsCount == 2){
+          $("#clockSet").addClass("settingHighlight");
+          $("#oneMoreSet").removeClass("settingHighlight");
+          settingsCount--;
+        }
+        else{
+          $("#oneMoreSet").addClass("settingHighlight");
+          $("#brightnessSet").removeClass("settingHighlight");
+          settingsCount = 0;
+        }
+      }
+
+      Leap.loop(controllerOptionsSettings, function(frame) {
+        if (frame.gestures.length > 0) {
+          for (var i = 0; i < frame.gestures.length; i++) {
+            var gesture = frame.gestures[i];
+            if(gesture.type == "circle") {
+              // console.log(gesture.type);
+                var newD = gesture.normal;
+                var clockwise = newD[2];
+                clockwise = parseFloat(clockwise);
+                var circlestate = gesture.state;
+                var circleprogress = gesture.progress;
+                var circleradius = gesture.radius;
+                console.log(settingsCount);
+
+                if(clockwise < 0 && circlestate == "stop" && circleprogress > 1 && circleradius > 10){
+                    console.log("next setting");
+                    nextSetting();
+                }
+                else if(clockwise > 0 && circlestate == "stop" && circleprogress > 1 && circleradius > 10){
+                    backSetting();
+                    console.log("back setting");
+
+                }
+            }
+          }
+        }
+      });
+      controllerOptionsSettings.connect();
+
+    }
   }
 });
 
 //NOT USING MOST OF THESE FUNCTIONS
-function vectorToString(vector, digits) {
-  if (typeof digits === "undefined") {
-    digits = 1;
-  }
-  return "(" + vector[0].toFixed(digits) + ", "
-             + vector[1].toFixed(digits) + ", "
-             + vector[2].toFixed(digits) + ")";
-}
-
-function togglePause() {
-  paused = !paused;
-
-  if (paused) {
-    document.getElementById("pause").innerText = "Resume";
-  } else {
-    document.getElementById("pause").innerText = "Pause";
-  }
-}
-
-function pauseForGestures() {
-  if (document.getElementById("pauseOnGesture").checked) {
-    pauseOnGesture = true;
-  } else {
-    pauseOnGesture = false;
-  }
-}
-
-function proportion(value,max,minrange,maxrange) {
-    return Math.round(((max-value)/(max))*(maxrange-minrange))+minrange;
-}
-
-function checkLibrary() {
-  if (typeof Leap === "undefined") {
-    document.getElementById("main").innerHTML = "The Leap Motion JavaScript client library (leap.js file) was not found. Please download the library from the GitHub project at <a href='https://github.com/leapmotion/leapjs'>https://github.com/leapmotion/leapjs</a>."
-    alert("The Leap Motion JavaScript client library (leap.js file) was not found. Please download the latest version from the GitHub project at https://github.com/leapmotion/leapjs");
-  }
-}
+// function vectorToString(vector, digits) {
+//   if (typeof digits === "undefined") {
+//     digits = 1;
+//   }
+//   return "(" + vector[0].toFixed(digits) + ", "
+//              + vector[1].toFixed(digits) + ", "
+//              + vector[2].toFixed(digits) + ")";
+// }
+//
+// function togglePause() {
+//   paused = !paused;
+//
+//   if (paused) {
+//     document.getElementById("pause").innerText = "Resume";
+//   } else {
+//     document.getElementById("pause").innerText = "Pause";
+//   }
+// }
+//
+// function pauseForGestures() {
+//   if (document.getElementById("pauseOnGesture").checked) {
+//     pauseOnGesture = true;
+//   } else {
+//     pauseOnGesture = false;
+//   }
+// }
+//
+// function proportion(value,max,minrange,maxrange) {
+//     return Math.round(((max-value)/(max))*(maxrange-minrange))+minrange;
+// }
+//
+// function checkLibrary() {
+//   if (typeof Leap === "undefined") {
+//     document.getElementById("main").innerHTML = "The Leap Motion JavaScript client library (leap.js file) was not found. Please download the library from the GitHub project at <a href='https://github.com/leapmotion/leapjs'>https://github.com/leapmotion/leapjs</a>."
+//     alert("The Leap Motion JavaScript client library (leap.js file) was not found. Please download the latest version from the GitHub project at https://github.com/leapmotion/leapjs");
+//   }
+// }
