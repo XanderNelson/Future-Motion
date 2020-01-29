@@ -67,7 +67,8 @@ main{
 #audio{
   float:right;
 }
-#audioPage img, #climatePage img, #navigationPage img{
+#audioPage img, #climatePage img, #navigationPage img,
+#brightnessPage img, #audioSettingsPage img{
   width: 120px;
   filter: drop-shadow(10px 10px 5px #222);
 
@@ -94,7 +95,7 @@ main{
 #songControl h3{
   font-size: 250%;
 }
-#volumeBar, #tempBar{
+#volumeBar, #tempBar, #trebleBar{
   margin: auto;
   width: 50%;
   margin-bottom: 20px;
@@ -111,7 +112,7 @@ main{
 #fanImg{
   transition: .5s;
 }
-#fanBar{
+#fanBar, #bassBar{
   margin: auto;
   width: 50%;
   /* margin-top: 20px;
@@ -121,10 +122,20 @@ main{
   width:0px;
   float: left;
 }
+#brightBar{
+  margin: auto;
+  width: 50%;
+  /* margin-top: 20px;
+  margin-bottom: 20px; */
+  background:white;
+  height:210px;
+  width:220px;
+  float: left;
+}
 #tempControl{
   padding-top:5%;
 }
-#volControl h2, #tempControl h2{
+#volControl h2, #tempControl h2, #bass, #trebleControl h2, #clockSetting{
   color:white;
   font-weight: 600;
   font-size: 500%;
@@ -143,7 +154,7 @@ main{
 }
 #settingList{
   /* padding-left: 20%; */
-  padding-top: 10%;
+  padding-top: 20%;
 }
 #settingsPage h2{
   padding-left: 1%;
@@ -159,4 +170,20 @@ main{
 }
 .settingHighlight{
   background-color: grey;
+}
+#brightnessPage{
+  width:100%;
+}
+#brightness{
+  padding-top: 30%;
+  margin-left: 0!important;
+}
+#brightnessImg{
+  padding-top: 5%;
+}
+#audioSettingsPage{
+  padding-top: 10%;
+}
+#clockSetting{
+  padding-top:30%;
 }
