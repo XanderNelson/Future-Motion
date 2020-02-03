@@ -6,7 +6,7 @@
     clock.innerHTML = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
   }
   setInterval(function () {
-      updateClock( clockElement );
+      updateClock(clockElement);
   }, 1000);
 }());
 
@@ -44,6 +44,7 @@ $(document).ready(function(){
   var bassTrebleOn = false;
   var brightnessOn = false;
   var clockOn = false;
+  var controllerOptionsNavigation = new Leap.Controller({enableGestures:true});//setting controller
   var controllerOptionsAudio = new Leap.Controller({enableGestures: true});//setting controller
   var controllerOptionsClimate = new Leap.Controller({enableGestures: true});//setting controller
   var controllerOptionsSettings = new Leap.Controller({enableGestures: true});//setting controller
@@ -58,6 +59,9 @@ $(document).ready(function(){
   var count5 = 0;
   var count6 = 100;
   var settingsCount = 0;
+
+
+
   function navigation(){
 
     navigationOn = true;
@@ -73,8 +77,57 @@ $(document).ready(function(){
     $("#settingsLogo").attr("src","images/settings3D");
     $("#navigationPage").show();
     $("#climatePage, #audioPage, #settingsPage, #brightnessPage, #audioSettingsPage, #clockSettingsPage").hide();
-  }
+    var theZoom = 10;
+    var locationAtlas = {lat: 40.007857, lng: -105.2697};
+    var map = new google.maps.Map(document.getElementById("navigationMap"), {
+          zoom: theZoom,
+          center: locationAtlas,
+          gestureHandling: 'none'
+    });
 
+    if(navigationOn == true){
+
+      Leap.loop(controllerOptionsNavigation, function(frame) {
+
+      if(navigationOn == false){
+        controllerOptionsNavigation.disconnect();
+        return;
+      }
+
+        if (frame.hands.length > 0) {
+            for (var i = 0; i < frame.hands.length; i++) {
+                var hand = frame.hands[i];
+                var newZoom = hand.palmPosition;
+                var height = newZoom[1];
+                // console.log(height);
+              }
+            }
+        if (frame.gestures.length > 0) {
+
+          for (var i = 0; i < frame.gestures.length; i++) {
+            var gesture = frame.gestures[i];
+            var tap = gesture.type;
+            }
+          }
+          if(height >= 300){
+            theZoom = 5;
+            map.setZoom(theZoom);
+          }
+          if(height >= 150 && height < 300){
+            theZoom = 10;
+            map.setZoom(theZoom);
+          }
+          if(height >= 50 && height < 150){
+            theZoom = 15;
+            map.setZoom(theZoom);
+          }
+
+
+
+          }); //end of leap loop
+      controllerOptionsNavigation.connect();
+    }
+  }
 
 
 
@@ -488,51 +541,6 @@ $(document).ready(function(){
 
     if(settingsOn == true){
 
-      // function nextSetting(){
-      //   if (settingsCount == 0){
-      //     $("#brightnessSet").removeClass("settingHighlight");
-      //     $("#audioSet").addClass("settingHighlight");
-      //     settingsCount++;
-      //   }
-      //   else if (settingsCount == 1){
-      //     $("#audioSet").removeClass("settingHighlight");
-      //     $("#clockSet").addClass("settingHighlight");
-      //     settingsCount++;
-      //   }
-      //   else if (settingsCount == 2){
-      //     $("#clockSet").removeClass("settingHighlight");
-      //     $("#oneMoreSet").addClass("settingHighlight");
-      //     settingsCount++;
-      //   }
-      //   else{
-      //     $("#oneMoreSet").removeClass("settingHighlight");
-      //     $("#brightnessSet").addClass("settingHighlight");
-      //     settingsCount = 0;
-      //   }
-      // }
-      // function backSetting(){
-      //   if (settingsCount == 0){
-      //     $("#brightnessSet").removeClass("settingHighlight");
-      //     $("#oneMoreSet").addClass("settingHighlight");
-      //     settingsCount = 3;
-      //   }
-      //   else if (settingsCount == 1){
-      //     $("#audioSet").addClass("settingHighlight");
-      //     $("#clockSet").removeClass("settingHighlight");
-      //     settingsCount--;
-      //   }
-      //   else if (settingsCount == 2){
-      //     $("#clockSet").addClass("settingHighlight");
-      //     $("#oneMoreSet").removeClass("settingHighlight");
-      //     settingsCount--;
-      //   }
-      //   else{
-      //     $("#oneMoreSet").addClass("settingHighlight");
-      //     $("#brightnessSet").removeClass("settingHighlight");
-      //     settingsCount = 0;
-      //   }
-      // }
-
       Leap.loop(controllerOptionsSettings, function(frame) {
         if(settingsOn == false){
           controllerOptionsSettings.disconnect();
@@ -588,33 +596,10 @@ $(document).ready(function(){
           //     console.log("key tap4");
           //   }
           // }
+
+
           }); //end of leap loop
 
-        // if (frame.gestures.length > 0) {
-        //   for (var i = 0; i < frame.gestures.length; i++) {
-        //     var gesture = frame.gestures[i];
-        //     if(gesture.type == "circle") {
-        //       // console.log(gesture.type);
-        //         var newD = gesture.normal;
-        //         var clockwise = newD[2];
-        //         clockwise = parseFloat(clockwise);
-        //         var circlestate = gesture.state;
-        //         var circleprogress = gesture.progress;
-        //         var circleradius = gesture.radius;
-        //         console.log(settingsCount);
-        //
-        //         if(clockwise < 0 && circlestate == "stop" && circleprogress > 1 && circleradius > 10){
-        //             console.log("next setting");
-        //             nextSetting();
-        //         }
-        //         else if(clockwise > 0 && circlestate == "stop" && circleprogress > 1 && circleradius > 10){
-        //             backSetting();
-        //             console.log("back setting");
-        //
-        //         }
-        //     }
-        //   }
-        // }
 
 
       controllerOptionsSettings.connect();

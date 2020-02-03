@@ -67,7 +67,7 @@ main{
 #audio{
   float:right;
 }
-#audioPage img, #climatePage img, #navigationPage img,
+#audioPage img, #climatePage img,
 #brightnessPage img, #audioSettingsPage img{
   width: 120px;
   filter: drop-shadow(10px 10px 5px #222);
@@ -186,4 +186,17 @@ main{
 }
 #clockSetting{
   padding-top:30%;
+}
+#navigationMap{
+  /* padding-top:25%; */
+  height:800px;
+  color:white;
+  width:1000px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+#navigationPage{
+  padding-top:8%;
+
 }
