@@ -58,6 +58,8 @@ $(document).ready(function(){
   var count4 = 0;
   var count5 = 0;
   var count6 = 100;
+  var count7 = 0;
+  var count8 = 0;
   var settingsCount = 0;
 
 
@@ -78,7 +80,9 @@ $(document).ready(function(){
     $("#navigationPage").show();
     $("#climatePage, #audioPage, #settingsPage, #brightnessPage, #audioSettingsPage, #clockSettingsPage").hide();
     var theZoom = 10;
-    var locationAtlas = {lat: 40.007857, lng: -105.2697};
+    var lat = 40.007857;
+    var long = -105.2697;
+    var locationAtlas = {lat: lat, lng: long};
     var map = new google.maps.Map(document.getElementById("navigationMap"), {
           zoom: theZoom,
           center: locationAtlas,
@@ -100,25 +104,27 @@ $(document).ready(function(){
                 var newZoom = hand.palmPosition;
                 var height = newZoom[1];
                 // console.log(height);
+
               }
             }
-        if (frame.gestures.length > 0) {
 
-          for (var i = 0; i < frame.gestures.length; i++) {
-            var gesture = frame.gestures[i];
-            var tap = gesture.type;
-            }
-          }
-          if(height >= 300){
+          if(height >= 350){
             theZoom = 5;
             map.setZoom(theZoom);
+            // lat = lat + 4;
+            // locationAtlas = {lat: lat, lng: long};
+            // map.setCenter(locationAtlas);
           }
-          if(height >= 150 && height < 300){
+          if(height >= 200 && height < 350){
             theZoom = 10;
             map.setZoom(theZoom);
           }
-          if(height >= 50 && height < 150){
+          if(height >= 100 && height < 200){
             theZoom = 15;
+            map.setZoom(theZoom);
+          }
+          if(height < 100){
+            theZoom = 20;
             map.setZoom(theZoom);
           }
 
