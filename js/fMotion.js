@@ -1,38 +1,40 @@
 
 // got clock function from https://stackoverflow.com/questions/28415178/how-do-you-show-the-current-time-on-a-web-page
+document.body.setAttribute( "style", "-webkit-transform: rotate(90deg);");
+
 (function () {
   var clockElement = document.getElementById( "clock" );
   function updateClock ( clock ) {
     clock.innerHTML = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
   }
   setInterval(function () {
-      updateClock( clockElement );
+      updateClock(clockElement);
   }, 1000);
 }());
-
+//terminal test
 $(document).ready(function(){
-  $("#climatePage, #navigationPage, #settingsPage, #audioPage").hide();
+  $("#climatePage, #navigationPage, #settingsPage, #audioPage, #brightnessPage, #audioSettingsPage, #clockSettingsPage").hide();
 
   $(document).keypress(function(event){
     var keyPressed = event.which || event.keyCode;
     // var keyPressed = event.which;
-    if(keyPressed == 49 || keyPressed == 50 || keyPressed == 51 || keyPressed == 52){
+    if(keyPressed == 122 || keyPressed == 120 || keyPressed == 99 || keyPressed == 118){
       $("main").css("background-image", "url('images/fMotionHomeActive')");
       $(".center").hide();
-      if(keyPressed == 49){
+      if(keyPressed == 122){
         navigation();
       }
-      else if(keyPressed == 50){
+      else if(keyPressed == 120){
         climate();
       }
-      else if(keyPressed == 51){
+      else if(keyPressed == 99){
         audio();
       }
-      else if(keyPressed == 52){
+      else if(keyPressed == 118){
         settings();
       }
     }
-    // console.log(keyPressed);
+    console.log(keyPressed);
 
   });
 
@@ -41,12 +43,28 @@ $(document).ready(function(){
   var climateOn = false;
   var audioOn = false;
   var settingsOn = false;
+  var bassTrebleOn = false;
+  var brightnessOn = false;
+  var clockOn = false;
+  var controllerOptionsNavigation = new Leap.Controller({enableGestures:true});//setting controller
   var controllerOptionsAudio = new Leap.Controller({enableGestures: true});//setting controller
   var controllerOptionsClimate = new Leap.Controller({enableGestures: true});//setting controller
+  var controllerOptionsSettings = new Leap.Controller({enableGestures: true});//setting controller
+  var controllerOptionsBrightness = new Leap.Controller({enableGestures: true});//setting controller
+  var controllerOptionsBassTreble = new Leap.Controller({enableGestures: true});//setting controller
+  var controllerOptionsClock = new Leap.Controller({enableGestures: true});//setting controller
 
   var count = 0;
   var count2 = 0;
   var count3 = 0;
+  var count4 = 0;
+  var count5 = 0;
+  var count6 = 100;
+  var count7 = 0;
+  var count8 = 0;
+  var settingsCount = 0;
+
+
 
   function navigation(){
 
@@ -54,14 +72,70 @@ $(document).ready(function(){
     climateOn = false;
     audioOn = false;
     settingsOn = false;
+    bassTrebleOn = false;
+    brightnessOn = false;
+    clockOn = false;
     $("#climateLogo").attr('src',"images/climate3D");
     $("#audioLogo").attr("src","images/audio3D");
     $("#navigationLogo").attr("src","images/navigationActive");
     $("#settingsLogo").attr("src","images/settings3D");
     $("#navigationPage").show();
-    $("#climatePage, #audioPage, #settingsPage").hide();
-  }
+    $("#climatePage, #audioPage, #settingsPage, #brightnessPage, #audioSettingsPage, #clockSettingsPage").hide();
+    var theZoom = 10;
+    var lat = 40.007857;
+    var long = -105.2697;
+    var locationAtlas = {lat: lat, lng: long};
+    var map = new google.maps.Map(document.getElementById("navigationMap"), {
+          zoom: theZoom,
+          center: locationAtlas,
+          gestureHandling: 'none'
+    });
 
+    if(navigationOn == true){
+
+      Leap.loop(controllerOptionsNavigation, function(frame) {
+
+      if(navigationOn == false){
+        controllerOptionsNavigation.disconnect();
+        return;
+      }
+
+        if (frame.hands.length > 0) {
+            for (var i = 0; i < frame.hands.length; i++) {
+                var hand = frame.hands[i];
+                var newZoom = hand.palmPosition;
+                var height = newZoom[1];
+                // console.log(height);
+
+              }
+            }
+
+          if(height >= 350){
+            theZoom = 5;
+            map.setZoom(theZoom);
+            // lat = lat + 4;
+            // locationAtlas = {lat: lat, lng: long};
+            // map.setCenter(locationAtlas);
+          }
+          if(height >= 200 && height < 350){
+            theZoom = 10;
+            map.setZoom(theZoom);
+          }
+          if(height >= 100 && height < 200){
+            theZoom = 15;
+            map.setZoom(theZoom);
+          }
+          if(height < 100){
+            theZoom = 20;
+            map.setZoom(theZoom);
+          }
+
+
+
+          }); //end of leap loop
+      controllerOptionsNavigation.connect();
+    }
+  }
 
 
 
@@ -76,12 +150,15 @@ $(document).ready(function(){
     climateOn = true;
     audioOn = false;
     settingsOn = false;
+    bassTrebleOn = false;
+    brightnessOn = false;
+    clockOn = false;
     $("#climateLogo").attr("src", "images/climateActive");
     $("#audioLogo").attr("src", "images/audio3D");
     $("#navigationLogo").attr("src","images/navigation3D");
     $("#settingsLogo").attr("src", "images/settings3D");
     $("#climatePage").show();
-    $("#navigationPage, #audioPage, #settingsPage").hide();
+    $("#navigationPage, #audioPage, #settingsPage, #brightnessPage, #audioSettingsPage, #clockSettingsPage").hide();
     if(climateOn == true){
       Leap.loop(controllerOptionsClimate, function(frame) {
       if(climateOn == false){
@@ -162,24 +239,34 @@ $(document).ready(function(){
     climateOn = false;
     audioOn = true;
     settingsOn = false;
+    bassTrebleOn = false;
+    brightnessOn = false;
+    clockOn = false;
     $("#climateLogo").attr("src","images/climate3D");
     $("#audioLogo").attr("src","images/audioActive");
     $("#navigationLogo").attr("src","images/navigation3D");
     $("#settingsLogo").attr("src", "images/settings3D");
     $("#audioPage").show();
-    $("#climatePage, #navigationPage, #settingsPage").hide();
+    $("#climatePage, #navigationPage, #settingsPage, #brightnessPage, #audioSettingsPage, #clockSettingsPage").hide();
     // $("#volumeBar").toggle(); //need to find a way to untoggle and hide again after a user goes into a different subject, but still keep playing music and have the same volume when they go back into that part of the page
       //This is all just for volume control so we need another type of gesture for pausing or changing the song which shouldn't be too hard
       //leapforward.js had all the different types of data the api gives you
+      // var songs = [
+      //   {"song": "Hot for Teacher","artist": "Van Halen","source": "../music/VanHalenHotforTeacher.wav"},
+      //   {"song": "Cocaine", "artist": "Eric Clapton", "source": "../music/Cocaine.mp3"},
+      //   {"song": "Girls, Girls, Girls", "artist": "Motle Crue", "source": "../music/Girls,Girls,Girls.mp3"},
+      //   {"song": "Dream On", "artist": "Aerosmith", "source": "../music/DreamOn.mp3"},
+      //   {"song": "Back in Black", "artist": "AC/DC", "source": "../music/BackinBlack.mp3"},
+      //   {"song": "Go Your Own Way", "artist": "Fleetwood Mac", "source": "../music/GoYourOwnWay.mp3"}
+      // ];
       var songs = [
-        {"song": "Hot for Teacher","artist": "Van Halen","source": "../music/VanHalenHotforTeacher.wav"},
-        {"song": "Cocaine", "artist": "Eric Clapton", "source": "../music/Cocaine.mp3"},
-        {"song": "Girls, Girls, Girls", "artist": "Motle Crue", "source": "../music/Girls,Girls,Girls.mp3"},
-        {"song": "Dream On", "artist": "Aerosmith", "source": "../music/DreamOn.mp3"},
-        {"song": "Back in Black", "artist": "AC/DC", "source": "../music/BackinBlack.mp3"},
-        {"song": "Go Your Own Way", "artist": "Fleetwood Mac", "source": "../music/GoYourOwnWay.mp3"}
+        {"song": "Song 1","artist": "Van Halen","source": "../music/VanHalenHotforTeacher.wav"},
+        {"song": "Song 2", "artist": "Eric Clapton", "source": "../music/Cocaine.mp3"},
+        {"song": "Song 3", "artist": "Motle Crue", "source": "../music/Girls,Girls,Girls.mp3"},
+        {"song": "Song 4", "artist": "Aerosmith", "source": "../music/DreamOn.mp3"},
+        {"song": "Song 5", "artist": "AC/DC", "source": "../music/BackinBlack.mp3"},
+        {"song": "Song 6", "artist": "Fleetwood Mac", "source": "../music/GoYourOwnWay.mp3"}
       ];
-
 
       var sources = ["music/VanHalenHotforTeacher.wav", "music/Cocaine.mp3", "music/Girls,Girls,Girls.mp3", "music/DreamOn.mp3", "music/BackinBlack.mp3", "music/GoYourOwnWay.mp3"];
 
@@ -333,7 +420,7 @@ $(document).ready(function(){
                             decreaseSong();
                         }
                     }
-                    if(gesture.type == "screenTap"){
+                    if(gesture.type == "keyTap"){
                       var direction = gesture.direction;
                       if(counter == 0){
                         if(isPlaying(playing)){
@@ -440,11 +527,6 @@ $(document).ready(function(){
                     }
             }
         }
-          if (frame.gestures.length > 0) {
-    if (pauseOnGesture) {
-      togglePause();
-    }
-    }
   });   //END OF LEAP LOOP
   controllerOptionsAudio.connect();
     }
@@ -462,50 +544,250 @@ $(document).ready(function(){
     climateOn = false;
     audioOn = false;
     settingsOn = true;
+    bassTrebleOn = false;
+    brightnessOn = false;
+    clockOn = false;
     $("#climateLogo").attr("src","images/climate3D");
     $("#audioLogo").attr("src", "images/audio3D");
     $("#navigationLogo").attr("src", "images/navigation3D");
     $("#settingsLogo").attr("src", "images/settingsActive");
     $("#settingsPage").show();
-    $("#climatePage, #audioPage, #navigationPage").hide();
+    $("#climatePage, #audioPage, #navigationPage, #brightnessPage, #audioSettingsPage, #clockSettingsPage").hide();
+
+    if(settingsOn == true){
+
+      Leap.loop(controllerOptionsSettings, function(frame) {
+        if(settingsOn == false){
+          controllerOptionsSettings.disconnect();
+          return;
+        }
+        if (frame.hands.length > 0) {
+            for (var i = 0; i < frame.hands.length; i++) {
+                var hand = frame.hands[i];
+                var newP = hand.palmPosition;
+                var height = newP[1];
+                // console.log(height);
+              }
+            }
+        if (frame.gestures.length > 0) {
+
+          for (var i = 0; i < frame.gestures.length; i++) {
+            var gesture = frame.gestures[i];
+            var tap = gesture.type;
+            }
+          }
+          if(height >= 300){
+            $("#audioSet").removeClass("settingHighlight");
+            $("#brightnessSet").addClass("settingHighlight");
+            $("#oneMoreSet").removeClass("settingHighlight");
+            if(tap == "keyTap"){
+              // console.log("key tap");
+              brightness();
+            }
+          }
+          if(height >= 150 && height < 300){
+            $("#brightnessSet").removeClass("settingHighlight");
+            $("#audioSet").addClass("settingHighlight");
+            $("#clockSet").removeClass("settingHighlight");
+            if(tap == "keyTap"){
+              // console.log("key tap2");
+              bassTreble();
+            }
+          }
+          if(height >= 50 && height < 150){
+            $("#audioSet").removeClass("settingHighlight");
+            $("#clockSet").addClass("settingHighlight");
+            $("#oneMoreSet").removeClass("settingHighlight");
+            if(tap == "keyTap"){
+              // console.log("key tap3");
+              clock();
+            }
+          }
+          // if(height >= 0 && height < 100){ THIS IS FOR FOURTH SETTINGS OPTION
+          //   $("#clockSet").removeClass("settingHighlight");
+          //   $("#oneMoreSet").addClass("settingHighlight");
+          //   $("#brightnessSet").removeClass("settingHighlight");
+          //   if(tap == "keyTap"){
+          //     console.log("key tap4");
+          //   }
+          // }
+
+
+          }); //end of leap loop
+
+
+
+      controllerOptionsSettings.connect();
+
+    }
   }
+
+  function brightness(){
+    navigationOn = false;
+    climateOn = false;
+    audioOn = false;
+    settingsOn = false;
+    bassTrebleOn = false;
+    brightnessOn = true;
+    clockOn = false;
+    $("#climateLogo").attr("src","images/climate3D");
+    $("#audioLogo").attr("src", "images/audio3D");
+    $("#navigationLogo").attr("src", "images/navigation3D");
+    $("#settingsLogo").attr("src", "images/settingsActive");
+    $("#brightnessPage").show();
+    $("#climatePage, #audioPage, #navigationPage, #settingsPage, #audioSettingsPage, #clockSettingsPage").hide();
+    if(brightnessOn == true){
+      Leap.loop(controllerOptionsBrightness, function(frame) {
+        if(brightnessOn == false){
+          controllerOptionsBrightness.disconnect();
+          return;
+        }
+        var bright = document.getElementById("brightBar");
+
+        if (frame.hands.length > 0) {
+
+          for (var i = 0; i < frame.hands.length; i++) {
+
+              var hand = frame.hands[i];
+              var newBrightV = hand.palmVelocity;//changing volume
+
+              var velocityB = newBrightV[0];
+              velocityB = parseFloat(velocityB);
+              // console.log(velocityH);
+
+
+              if (frame.gestures.length > 0) {
+                for (var i = 0; i < frame.gestures.length; i++) {
+                  var gesture = frame.gestures[i];
+                  if(gesture.type == "swipe") {
+                    console.log(count6);
+                      var isHorizontal = Math.abs(gesture.direction[0]) > Math.abs(gesture.direction[1]);
+                      if(isHorizontal){
+                        if(velocityB > 200 && count6 < 150){//function to change fan speed
+                          document.body.style.filter = "brightness(" + (count6/1.5) + "%)";
+
+                            bright.style.width= count6*2+"px";
+                            count6=count6+2;
+                            }
+                        if(velocityB < (-200) && count6 > 0){
+                          document.body.style.filter = "brightness(" + count6 + "%)";
+
+                            bright.style.width= count6*2+"px";
+                            count6=count6-2;
+                          }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+      });
+
+    }
+    controllerOptionsBrightness.connect();
+  }
+
+  function bassTreble(){
+    navigationOn = false;
+    climateOn = false;
+    audioOn = false;
+    settingsOn = false;
+    bassTrebleOn = true;
+    brightnessOn = false;
+    clockOn = false;
+    $("#climateLogo").attr("src","images/climate3D");
+    $("#audioLogo").attr("src", "images/audio3D");
+    $("#navigationLogo").attr("src", "images/navigation3D");
+    $("#settingsLogo").attr("src", "images/settingsActive");
+    $("#audioSettingsPage").show();
+    $("#climatePage, #audioPage, #navigationPage, #settingsPage, #brightnessPage, #clockSettingsPage").hide();
+    Leap.loop(controllerOptionsBassTreble, function(frame) {
+      if(bassTrebleOn == false){
+        controllerOptionsBassTreble.disconnect();
+        return;
+      }
+      var bass = document.getElementById("bassBar");
+      var treble = document.getElementById("trebleBar");
+
+      if (frame.hands.length > 0) {
+
+        for (var i = 0; i < frame.hands.length; i++) {
+
+            var hand = frame.hands[i];
+            var newAudioV = hand.palmVelocity;//changing volume
+
+            var bassV = newAudioV[0];
+            var trebleV = newAudioV[2];
+            bassV = parseFloat(bassV);
+            trebleV = parseFloat(trebleV);
+            // console.log(velocityH);
+
+
+            if (frame.gestures.length > 0) {
+              for (var i = 0; i < frame.gestures.length; i++) {
+                var gesture = frame.gestures[i];
+                if(gesture.type == "swipe") {
+                    var isHorizontal = Math.abs(gesture.direction[0]) > Math.abs(gesture.direction[1]);
+                    if(isHorizontal){
+                      if(bassV > 200 && count4 < 100){//function to change fan speed
+                          bass.style.width= count4*3+"px";
+                          count4=count4+2;
+                          }
+                      if(bassV < (-200) && count4 > 0){
+                          bass.style.width= count4*3+"px";
+                          count4=count4-2;
+                        }
+                    }
+                    else{
+                      if(trebleV > 200 && count5 < 100){//function to change temp
+                        // console.log(count3);
+                              treble.style.height= count5*3+"px";
+                              count5=count5+2;
+                          }
+                      if(trebleV < (-200) && count5 > 0){
+                          treble.style.height= count5*3+"px";
+                          count5=count5-2;
+                        }
+                    }
+                 }
+               }
+            }
+          }
+      }
+
+    });
+    controllerOptionsBassTreble.connect();
+  }
+
+  function clock(){
+    navigationOn = false;
+    climateOn = false;
+    audioOn = false;
+    settingsOn = false;
+    bassTrebleOn = false;
+    brightnessOn = false;
+    clockOn = true;
+    $("#climateLogo").attr("src","images/climate3D");
+    $("#audioLogo").attr("src", "images/audio3D");
+    $("#navigationLogo").attr("src", "images/navigation3D");
+    $("#settingsLogo").attr("src", "images/settingsActive");
+    $("#clockSettingsPage").show();
+    $("#climatePage, #audioPage, #navigationPage, #settingsPage, #brightnessPage, #audioSettingsPage").hide();
+    if(clockOn == true){
+      Leap.loop(controllerOptionsBassTreble, function(frame) {
+        if(clockOn == false){
+          controllerOptionsClock.disconnect();
+          return;
+        }
+
+
+
+      });
+    }
+
+    controllerOptionsBassTreble.connect();
+
+  }
+
+
 });
-
-//NOT USING MOST OF THESE FUNCTIONS
-function vectorToString(vector, digits) {
-  if (typeof digits === "undefined") {
-    digits = 1;
-  }
-  return "(" + vector[0].toFixed(digits) + ", "
-             + vector[1].toFixed(digits) + ", "
-             + vector[2].toFixed(digits) + ")";
-}
-
-function togglePause() {
-  paused = !paused;
-
-  if (paused) {
-    document.getElementById("pause").innerText = "Resume";
-  } else {
-    document.getElementById("pause").innerText = "Pause";
-  }
-}
-
-function pauseForGestures() {
-  if (document.getElementById("pauseOnGesture").checked) {
-    pauseOnGesture = true;
-  } else {
-    pauseOnGesture = false;
-  }
-}
-
-function proportion(value,max,minrange,maxrange) {
-    return Math.round(((max-value)/(max))*(maxrange-minrange))+minrange;
-}
-
-function checkLibrary() {
-  if (typeof Leap === "undefined") {
-    document.getElementById("main").innerHTML = "The Leap Motion JavaScript client library (leap.js file) was not found. Please download the library from the GitHub project at <a href='https://github.com/leapmotion/leapjs'>https://github.com/leapmotion/leapjs</a>."
-    alert("The Leap Motion JavaScript client library (leap.js file) was not found. Please download the latest version from the GitHub project at https://github.com/leapmotion/leapjs");
-  }
-}
